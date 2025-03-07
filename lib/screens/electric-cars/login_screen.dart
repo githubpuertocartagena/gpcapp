@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (encryptedMessage != null) {
+      print("mensaje encriptado: $encryptedMessage");
       final success = await AuthService.fetchLogin(encryptedMessage);
 
       if (success) {
@@ -36,10 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
           SnackBar(content: Text('Usuario o contraseña incorrectos')),
         );
       }
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ScanScreen()),
-      );
+     
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuario o contraseña incorrectos')),
@@ -65,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Opacity(
               opacity: 0.3,
               child: Image.asset(
-                'assets/images/background.png',
+                'images/background.png',
                 fit: BoxFit.cover,
               ),
             ),

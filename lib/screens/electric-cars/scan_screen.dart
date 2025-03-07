@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gpcapp/screens/electric-cars/assign_form.dart';
+import 'package:gpcapp/screens/electric-cars/scanner_screen.dart';
 
 class ScanScreen extends StatelessWidget{
   const ScanScreen({super.key});
@@ -22,7 +23,7 @@ class ScanScreen extends StatelessWidget{
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ElectricFormScreen()),
+                  MaterialPageRoute(builder: (context) => ScannerScreen()),
                 );
               },
               child: Text('Escanear Código QR'),

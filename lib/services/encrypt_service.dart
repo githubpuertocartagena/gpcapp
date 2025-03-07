@@ -1,66 +1,60 @@
+import 'dart:convert';
 import 'package:encrypt/encrypt.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 import 'package:http/http.dart' as http;
 
 class RSAService {
-  String? errorRSA;
+  static const String backendKeyUrl =
+      'https://carros-electricos.azurewebsites.net/auth/public-key';
 
-  /// 🔹 Obtiene la clave pública del backend
-  Future<String?> fetchPublicKey() async {
+  Future<RSAPublicKey?> fetchPublicKey() async {
     try {
-      final response = await http.get(Uri.parse('https://carros-electricos.azurewebsites.net/auth/public-key'));
+      final response = await http.get(Uri.parse(backendKeyUrl));
 
       if (response.statusCode == 200) {
-        return formatPublicKey(response.body);
+        final publicKeyBase64 = response.body;
+        return parsePublicKey(formatPublicKey(publicKeyBase64));
       } else {
-        errorRSA = "Error al obtener la clave pública: ${response.statusCode}";
+        print("Error al obtener la clave pública: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      errorRSA = "Error al obtener la clave pública: $e";
       return null;
     }
   }
 
-  /// 🔹 Encripta un mensaje con RSA
-  Future<String?> encryptMessage(dynamic data) async {
-    final publicKeyPEM = await fetchPublicKey();
+  String formatPublicKey(String publicKeyBase64) {
+    final cleanBase64 = publicKeyBase64.replaceAll(RegExp(r'\s+'), '');
+    final formattedKey = RegExp('.{1,64}')
+        .allMatches(cleanBase64)
+        .map((m) => m.group(0))
+        .join('\n');
 
-    if (publicKeyPEM == null) {
-      return null;
-    }
-
-    try {
-      final parser = RSAKeyParser();
-      final publicKey = parser.parse(publicKeyPEM) as RSAPublicKey;
-
-      final encrypter = Encrypter(RSA(
-        publicKey: publicKey,
-        encoding: RSAEncoding.PKCS1, // Usa PKCS1Padding, igual que el backend en Spring Boot
-      ));
-
-      final message = (data is Map || data is List) ? data.toString() : data.toString();
-      final encrypted = encrypter.encrypt(message);
-
-      return encrypted.base64;
-    } catch (e) {
-      errorRSA = "Error al encriptar el mensaje: $e";
-      return null;
-    }
-  }
-
-  /// 🔹 Convierte una clave pública Base64 en formato PEM
-String formatPublicKey(String publicKeyBase64) {
-  try {
-    final cleanBase64 = publicKeyBase64.replaceAll(RegExp(r'\s+'), ''); // Limpiar espacios
-    final formattedKey = RegExp('.{1,64}').allMatches(cleanBase64).map((m) => m.group(0)).join('\n');
-    
     return '''-----BEGIN PUBLIC KEY-----
 $formattedKey
 -----END PUBLIC KEY-----''';
-  } catch (e) {
-    throw Exception("Error al formatear la clave pública: $e");
   }
-}
 
+  RSAPublicKey parsePublicKey(String pem) {
+    final parser = RSAKeyParser();
+    return parser.parse(pem) as RSAPublicKey;
+  }
+
+  Future<String?> encryptMessage(dynamic data) async {
+    final publicKey = await fetchPublicKey();
+    if (publicKey == null) return null;
+
+    try {
+      final encrypter = Encrypter(RSA(
+        publicKey: publicKey,
+        encoding: RSAEncoding.PKCS1, // ✅ Compatible con el backend
+      ));
+
+      final message = jsonEncode(data);
+      final encrypted = encrypter.encrypt(message);
+      return encrypted.base64;
+    } catch (e) {
+      return null;
+    }
+  }
 }

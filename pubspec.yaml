@@ -7,14 +7,20 @@ environment:
   sdk: ^3.6.2
 
 dependencies:
-  flutter_secure_storage: ^10.0.0-beta.4  
-  shared_preferences: ^2.0.8       
-  http: ^1.3.0                    
-  encrypt: ^5.0.3
   flutter:
     sdk: flutter
+  camera: ^0.10.5+4      # 📸 Para usar la cámara
+  mobile_scanner: ^3.2.0 # 📡 Para escanear códigos QR
+  go_router: ^6.0.0 # 🚀 Para navegación
+  flutter_riverpod: ^2.0.0 # 🛠️ Para manejar estados
+  flutter_secure_storage: ^8.0.0
+  http: ^1.3.0
+  shared_preferences: ^2.5.2
+  pointycastle: 3.9.1                       
+  encrypt: ^5.0.3
+
 assets:
-  - assets/images/background.png
+  - images/background.png
 dev_dependencies:
   flutter_test:
     sdk: flutter
