@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gpcapp/screens/electric-cars/assign-form.dart';
+import 'package:gpcapp/screens/electric-cars/assign_form.dart';
 
 class ScanScreen extends StatelessWidget{
   const ScanScreen({super.key});
@@ -29,15 +29,6 @@ class ScanScreen extends StatelessWidget{
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ElectricFormScreen()),
-          );
-        },
-        child: Icon(Icons.qr_code_scanner),
       ),
     );
   }

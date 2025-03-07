@@ -1,6 +1,9 @@
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:gpcapp/screens/electric-cars/scan-screen.dart';
+import 'package:gpcapp/screens/electric-cars/scan_screen.dart';
+import 'package:gpcapp/services/auth_service.dart';
+import 'package:gpcapp/services/encrypt_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -12,8 +15,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
-  void _login() {
-    if (_usernameController.text == 'admin' && _passwordController.text == '1234') {
+  void _login() async {
+    final rsaService = RSAService();
+
+    final encryptedMessage = await rsaService.encryptMessage({
+      "user": _usernameController.text,
+      "password": _passwordController.text
+    });
+
+    if (encryptedMessage != null) {
+      final success = await AuthService.fetchLogin(encryptedMessage);
+
+      if (success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ScanScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuario o contraseña incorrectos')),
+        );
+      }
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => ScanScreen()),
@@ -66,7 +88,11 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("Bienvenido", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF003A70))),
+                  Text("Bienvenido",
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF003A70))),
                   SizedBox(height: 20),
                   TextField(
                     controller: _usernameController,
@@ -85,7 +111,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.lock, color: Color(0xFF003A70)),
                       suffixIcon: IconButton(
-                        icon: Icon(_isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                        icon: Icon(_isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                         onPressed: () {
                           setState(() {
                             _isPasswordVisible = !_isPasswordVisible;
@@ -98,11 +126,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF0075C9),
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
                     onPressed: _login,
-                    child: Text("Ingresar", style: TextStyle(fontSize: 18, color: Colors.white)),
+                    child: Text("Ingresar",
+                        style: TextStyle(fontSize: 18, color: Colors.white)),
                   ),
                 ],
               ),

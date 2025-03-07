@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gpcapp/screens/electric-cars/login-screen.dart';
+import 'package:gpcapp/screens/electric-cars/login_screen.dart';
 
 void main() {
   runApp(MaterialApp(
