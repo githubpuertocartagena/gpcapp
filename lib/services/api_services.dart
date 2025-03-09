@@ -9,9 +9,6 @@ class ApiService {
     var response = await _makeRequest(url, method, accessToken, body);
 
     if (response?.statusCode == 401) {
-      if (accessToken == null) {
-        return null; // No autorizado, manejar redirección en la UI
-      }
       response = await _makeRequest(url, method, accessToken, body);
     }
 
@@ -19,7 +16,7 @@ class ApiService {
   }
 
   static Future<http.Response> _makeRequest(String url, String method, String? accessToken, Map<String, dynamic>? body) async {
-    Uri uri = Uri.parse(url);
+    Uri uri = Uri.parse("https://carros-electricos.azurewebsites.net/"+url);
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       if (accessToken != null) 'Authorization': 'Bearer $accessToken',

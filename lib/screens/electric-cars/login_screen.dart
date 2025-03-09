@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:gpcapp/screens/electric-cars/scan_screen.dart';
 import 'package:gpcapp/services/auth_service.dart';
 import 'package:gpcapp/services/encrypt_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -24,10 +26,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (encryptedMessage != null) {
-      print("mensaje encriptado: $encryptedMessage");
       final success = await AuthService.fetchLogin(encryptedMessage);
-
       if (success) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', _usernameController.text);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ScanScreen()),
@@ -63,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Opacity(
               opacity: 0.3,
               child: Image.asset(
-                'images/background.png',
+                'assets/images/background.png',
                 fit: BoxFit.cover,
               ),
             ),

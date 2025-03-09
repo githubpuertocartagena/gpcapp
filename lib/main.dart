@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gpcapp/screens/electric-cars/login_screen.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(ProviderScope(
+      child: MaterialApp(
     home: LoginScreen(),
     theme: ThemeData(
       primaryColor: Color(0xFF003A70), // Azul oscuro característico
@@ -35,5 +37,5 @@ void main() {
         ),
       ),
     ),
-  ));
+  )));
 }

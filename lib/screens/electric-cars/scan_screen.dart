@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gpcapp/screens/electric-cars/assign_form.dart';
 import 'package:gpcapp/screens/electric-cars/scanner_screen.dart';
 
 class ScanScreen extends StatelessWidget{

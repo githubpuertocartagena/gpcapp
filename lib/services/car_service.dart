@@ -8,8 +8,6 @@ class CarService {
     final prefs = await SharedPreferences.getInstance();
     String? qrValue = prefs.getString('qr2') ?? prefs.getString('qr1');
 
-    if (qrValue == null) return null;
-
     final response = await ApiService.fetchRequest('$apiBaseUrl/placa/$qrValue', 'GET');
 
     if (response != null && response.statusCode == 200) {
