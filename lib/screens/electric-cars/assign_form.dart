@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gpcapp/screens/electric-cars/scan_screen.dart';
 import 'package:gpcapp/services/api_services.dart';
+import 'package:gpcapp/widgets/app_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ElectricFormScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _ElectricFormScreenState extends State<ElectricFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Puerto de Cartagena')),
+      appBar: CustomAppBar(title: "Formulario "),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -130,19 +131,19 @@ class _ElectricFormScreenState extends State<ElectricFormScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton.icon(
-                        onPressed: () => _saveForm(),
-                        icon: const Icon(Icons.save, color: Colors.white),
-                        label: const Text("Guardar"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        ),
-                      ),
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: _isLoading ? null : () => _saveForm(),
+                  icon: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Icon(Icons.save, color: Colors.white),
+                  label: const Text("Guardar"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isLoading ? Colors.grey : Colors.blue,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isLoading ? null : () {
                     Navigator.pop(context); // Cierra la pantalla
                   },
                   icon: const Icon(Icons.cancel, color: Colors.white),
@@ -161,31 +162,49 @@ class _ElectricFormScreenState extends State<ElectricFormScreen> {
     );
   }
 
+  // ✅ Muestra el popup de carga
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Evita que el usuario lo cierre manualmente
+      builder: (context) {
+        return const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text("Enviando formulario, por favor espere...")
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ✅ Cierra el popup de carga
+  void _hideLoadingDialog() {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
+  }
+
   // ✅ Función para guardar respuestas y observaciones
   void _saveForm() async {
     setState(() => _isLoading = true);
+    _showLoadingDialog();
 
     final prefs = await SharedPreferences.getInstance();
     final username = prefs.getString("username") ?? "";
     final carCode = prefs.getString("qr1") ?? "";
 
     if (username.isEmpty || carCode.isEmpty) {
+      _hideLoadingDialog();
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Error: Datos faltantes, intente nuevamente")),
+        const SnackBar(content: Text("Error: Datos faltantes, intente nuevamente")),
       );
       return;
-    }
-
-    // 📌 Verificar que todas las preguntas han sido respondidas
-    for (var question in questions) {
-      if (selectedAnswers[question["key"]] == null) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("⚠️ Completa todas las preguntas antes de continuar.")),
-        );
-        return;
-      }
     }
 
     // 📌 Crear estructura de datos para enviar
@@ -199,29 +218,22 @@ class _ElectricFormScreenState extends State<ElectricFormScreen> {
     };
 
     try {
-      // 📌 Llamar APIService en lugar de fetchRequest
       await ApiService.fetchRequest("form", "POST", body: formData);
-
       if (widget.reassign) {
-        await ApiService.fetchRequest("form", "POST", body: {
-          ...formData,
-          "tipo": "ENTREGA",
-        });
+        await ApiService.fetchRequest("form", "POST", body: {...formData, "tipo": "ENTREGA"});
       }
-
       await ApiService.fetchRequest(widget.action, "PUT");
 
+      _hideLoadingDialog();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("✅ Formulario enviado con éxito")),
+        const SnackBar(content: Text("Formulario enviado con éxito")),
       );
 
-       Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ScanScreen()),
-        );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ScanScreen()));
     } catch (error) {
+      _hideLoadingDialog();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Error al enviar formulario")),
+        const SnackBar(content: Text("Error al enviar formulario")),
       );
     } finally {
       setState(() => _isLoading = false);

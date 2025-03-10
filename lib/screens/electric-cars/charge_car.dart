@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gpcapp/screens/electric-cars/charge_scanner.dart';
 
-class ChargingCarScreen extends StatelessWidget {
-  const ChargingCarScreen({super.key});
+class ChargeCarScreen extends StatelessWidget {
+  const ChargeCarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], // Fondo oscuro para diseño moderno
+      backgroundColor: Colors.grey[900], 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -19,14 +20,14 @@ class ChargingCarScreen extends StatelessWidget {
 
               // 📌 Mensaje informativo
               const Text(
-                "El carro ya está cargando...",
+                "Debe seleccionar el carro a cargar",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 15),
 
               const Text(
-                "Por favor, espere a que termine la carga.",
+                "Seleccione carro a cargar",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, color: Colors.white70),
               ),
@@ -37,10 +38,9 @@ class ChargingCarScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.pop(context);
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => ChargeScannerScreen()));
                   },
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  label: const Text("Volver"),
+                  label: const Text("Escanear"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,

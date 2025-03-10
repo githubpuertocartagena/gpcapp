@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gpcapp/screens/electric-cars/charge_car.dart';
+import 'package:gpcapp/screens/electric-cars/charging.dart';
 import 'package:gpcapp/screens/electric-cars/confirm_car.dart';
 import 'package:gpcapp/screens/electric-cars/leave_car.dart';
 import 'package:gpcapp/screens/electric-cars/occupied_car.dart';
 import 'package:gpcapp/services/api_services.dart';
+import 'package:gpcapp/widgets/app_bar.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,6 +47,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
     }
   }
 
+  // 🔹 Cierra sesión y redirige a la pantalla de login
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Limpia todos los datos guardados
+    Navigator.pushReplacementNamed(context, "/login"); // Redirige al login
+  }
+
   // 🔹 Maneja el escaneo
   void _handleScan(String qrValue) async {
     try {
@@ -64,7 +74,6 @@ class _ScannerScreenState extends State<ScannerScreen> {
       }
 
       final status = response.body.trim();
-      print("🔍 Estado del QR: $status");
 
       if (status == "take") {
         Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmCarScreen()));
@@ -72,9 +81,13 @@ class _ScannerScreenState extends State<ScannerScreen> {
         Navigator.push(context, MaterialPageRoute(builder: (context) => OccupiedCarScreen()));
       } else if (status == "return") {
         Navigator.push(context, MaterialPageRoute(builder: (context) => LeaveCarScreen()));
-      } else {
+      } else if (status == "Charging") {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChargingCarScreen()));
+      }  else if (status == "scan car") {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ChargeCarScreen()));
+      }  else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("⚠️ Código QR no reconocido")),
+          const SnackBar(content: Text("Código QR no reconocido")),
         );
       }
     } catch (e) {
@@ -97,9 +110,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Escáner QR")),
+      appBar: CustomAppBar(title: "Escáner QR"),
       body: Platform.isIOS && Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')
-          ? const Center(child: Text("📵 La cámara no está disponible en el simulador"))
+          ? const Center(child: Text("La cámara no está disponible en el simulador"))
           : Stack(
               children: [
                 MobileScanner(
@@ -108,34 +121,43 @@ class _ScannerScreenState extends State<ScannerScreen> {
                     final List<Barcode> barcodes = capture.barcodes;
                     for (final barcode in barcodes) {
                       final String qrValue = barcode.rawValue ?? "Código no válido";
-                      print("📸 Código QR detectado: $qrValue");
                       _handleScan(qrValue);
                     }
                   },
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        scannerController.stop();
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Cerrar escáner QR"),
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _handleScan("CE-CTC04-C523J");
-                      },
-                      child: const Text("Simular QR"),
-                    ),
+                Positioned(
+                  bottom: 30,
+                  left: 20,
+                  right: 20,
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          _handleScan("EC-H4F2M-8D722"); // 🔥 Simulación de QR
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
+                        child: const Text("🔄 Simular QR"),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          scannerController.stop();
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
+                        child: const Text("❌ Cerrar escáner"),
+                      ),
+                    ],
                   ),
                 ),
               ],

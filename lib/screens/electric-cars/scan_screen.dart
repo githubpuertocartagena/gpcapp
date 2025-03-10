@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gpcapp/screens/electric-cars/scanner_screen.dart';
+import 'package:gpcapp/widgets/app_bar.dart';
 
 class ScanScreen extends StatelessWidget{
   const ScanScreen({super.key});
@@ -9,9 +10,7 @@ class ScanScreen extends StatelessWidget{
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Escanear Código QR'),
-      ),
+      appBar: CustomAppBar(title: "Escáner QR"),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
