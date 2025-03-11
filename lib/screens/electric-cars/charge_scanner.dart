@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gpcapp/screens/electric-cars/confirm_charge_car.dart';
-import 'package:gpcapp/screens/electric-cars/occupied_car.dart';
 import 'package:gpcapp/screens/electric-cars/stop_charging.dart';
 import 'package:gpcapp/services/api_services.dart';
 import 'package:gpcapp/widgets/app_bar.dart';
@@ -17,6 +16,15 @@ class ChargeScannerScreen extends StatefulWidget {
 
 class _ChargeScannerScreenState extends State<ChargeScannerScreen> {
   late MobileScannerController scannerController;
+  bool _isProcessing = false; // 🔹 Para controlar el estado de carga
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Platform.isIOS || !Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')) {
+      scannerController = MobileScannerController(facing: CameraFacing.back);
+    }
+  }
 
   // 🔹 Muestra el popup de carga
   void _showLoadingDialog() {
@@ -45,49 +53,55 @@ class _ChargeScannerScreenState extends State<ChargeScannerScreen> {
     }
   }
 
-
   // 🔹 Maneja el escaneo
   void _handleScan(String qrValue) async {
+    if (_isProcessing) return; // Evita múltiples escaneos simultáneos
+    setState(() => _isProcessing = true);
+
     try {
-      _showLoadingDialog(); 
+      scannerController.stop(); // 🔹 Detener el escáner para evitar múltiples lecturas
+      _showLoadingDialog();
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("qr2", qrValue);
       final response = await ApiService.fetchRequest("charge-status/$qrValue", "GET");
 
-      _hideLoadingDialog(); // Oculta el popup de carga
+      _hideLoadingDialog();
 
       if (response == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Error: No se pudo conectar con el servidor")),
+          const SnackBar(content: Text("❌ Error: No se pudo conectar con el servidor")),
         );
+        scannerController.start(); // Reiniciar el escáner
+        setState(() => _isProcessing = false);
         return;
       }
 
       final status = response.body.trim();
-
       if (status == "charge") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmChargeCarScreen()));
-      } else if (status == "stopCharge") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => StopChargingScreen()));
-      }  else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Código QR no reconocido")),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ConfirmChargeCarScreen()),
         );
+      } else if (status == "stopCharge") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => StopChargingScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Código QR no reconocido")),
+        );
+        scannerController.start(); 
       }
     } catch (e) {
-      _hideLoadingDialog(); 
+      _hideLoadingDialog();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Error al procesar el código QR")),
       );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (!Platform.isIOS || !Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')) {
-      scannerController = MobileScannerController(facing: CameraFacing.back);
+      scannerController.start(); 
+    } finally {
+      setState(() => _isProcessing = false);
     }
   }
 
@@ -115,31 +129,21 @@ class _ChargeScannerScreenState extends State<ChargeScannerScreen> {
                   right: 20,
                   child: Column(
                     children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _handleScan("CE-CTC04-C523J"); 
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          textStyle: const TextStyle(fontSize: 16),
-                        ),
-                        child: const Text("Simular QR"),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
+                     
+                      ElevatedButton.icon(
                         onPressed: () {
                           scannerController.stop();
                           Navigator.pop(context);
                         },
+                        icon: const Icon(Icons.cancel, size: 24, color: Colors.white),
+                        label: const Text("Cerrar escáner", style: TextStyle(fontSize: 16)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: Colors.red[600],
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          textStyle: const TextStyle(fontSize: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text("Cerrar escáner"),
                       ),
                     ],
                   ),

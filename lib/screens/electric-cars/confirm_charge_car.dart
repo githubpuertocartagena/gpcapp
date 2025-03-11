@@ -51,9 +51,6 @@ class _ConfirmChargeCarScreenState extends State<ConfirmChargeCarScreen> {
       final carCode = prefs.getString("qr2") ?? "";
       final stationCode = prefs.getString("qr1") ?? "";
 
-      print("QR "+username);
-      print("QR "+carCode);
-
       final response = await ApiService.fetchRequest(
           "assign-station/$carCode/$stationCode/$username", "PUT");
 

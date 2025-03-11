@@ -1,5 +1,5 @@
 name: gpcapp
-description: "A new Flutter project."
+description: "Gestion de empleados internos del grupo puerto de cartagena"
 publish_to: 'none'
 version: 0.1.0
 
@@ -9,15 +9,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  camera: ^0.10.5+4      # 📸 Para usar la cámara
-  mobile_scanner: ^3.2.0 # 📡 Para escanear códigos QR
-  go_router: ^6.0.0 # 🚀 Para navegación
-  flutter_riverpod: ^2.0.0 # 🛠️ Para manejar estados
+  camera: ^0.10.5+4      
+  mobile_scanner: ^3.2.0 
+  go_router: ^6.0.0 
+  flutter_riverpod: ^2.0.0 
   flutter_secure_storage: ^8.0.0
   http: ^1.3.0
   shared_preferences: ^2.5.2
   pointycastle: 3.9.1                       
   encrypt: ^5.0.3
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -30,3 +31,9 @@ flutter:
   assets:
     - assets/images/background.png
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"

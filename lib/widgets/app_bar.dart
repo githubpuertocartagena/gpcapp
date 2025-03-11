@@ -10,14 +10,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
   });
 
+  // 🔹 Obtiene el usuario guardado en SharedPreferences
+  Future<String> _getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("username") ?? "Invitado";
+  }
+
   // 🔹 Función para hacer logout
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); 
-    Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
+    await prefs.clear(); // Limpia los datos almacenados
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
   }
 
   @override
@@ -26,9 +32,44 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(title),
       automaticallyImplyLeading: false, // 🔥 Elimina la flecha atrás
       actions: [
-        IconButton(
-          icon: const Icon(Icons.logout, color: Colors.white),
-          onPressed: () => _logout(context), // Llama al logout
+        FutureBuilder<String>(
+          future: _getUsername(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: CircularProgressIndicator(color: Colors.white),
+              );
+            }
+
+            final username = snapshot.data ?? "Invitado";
+
+            return Row(
+              children: [
+                Text(
+                  username,
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                const SizedBox(width: 10),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.account_circle, color: Colors.white, size: 28),
+                  onSelected: (value) {
+                    if (value == "logout") _logout(context);
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: "logout",
+                      child: ListTile(
+                        leading: Icon(Icons.logout, color: Colors.red),
+                        title: Text("Cerrar sesión"),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 10),
+              ],
+            );
+          },
         ),
       ],
     );

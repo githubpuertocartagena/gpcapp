@@ -19,6 +19,15 @@ class ScannerScreen extends StatefulWidget {
 
 class _ScannerScreenState extends State<ScannerScreen> {
   late MobileScannerController scannerController;
+  bool _isProcessing = false; // 🔹 Para evitar múltiples lecturas
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Platform.isIOS || !Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')) {
+      scannerController = MobileScannerController(facing: CameraFacing.back);
+    }
+  }
 
   // 🔹 Muestra el popup de carga
   void _showLoadingDialog() {
@@ -56,7 +65,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
 
   // 🔹 Maneja el escaneo
   void _handleScan(String qrValue) async {
+    if (_isProcessing) return; // Evita múltiples lecturas
+    setState(() => _isProcessing = true);
+
     try {
+      scannerController.stop(); // 🔹 Detener el escáner antes de continuar
       _showLoadingDialog(); // Muestra el popup de carga
 
       final prefs = await SharedPreferences.getInstance();
@@ -64,46 +77,45 @@ class _ScannerScreenState extends State<ScannerScreen> {
       final username = prefs.getString("username") ?? "guest";
       final response = await ApiService.fetchRequest("status/$qrValue/$username", "GET");
 
-      _hideLoadingDialog(); // Oculta el popup de carga
-
+      _hideLoadingDialog(); 
       if (response == null) {
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("❌ Error: No se pudo conectar con el servidor")),
+          const SnackBar(content: Text("Error: No se pudo conectar con el servidor")),
         );
+        
+        scannerController.start(); 
+        setState(() => _isProcessing = false);
+        
         return;
       }
 
       final status = response.body.trim();
-
+      
       if (status == "take") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ConfirmCarScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConfirmCarScreen()));
       } else if (status == "occupied") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => OccupiedCarScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => OccupiedCarScreen()));
       } else if (status == "return") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => LeaveCarScreen()));
-      } else if (status == "Charging") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChargingCarScreen()));
-      }  else if (status == "scan car") {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChargeCarScreen()));
-      }  else {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LeaveCarScreen()));
+      } else if (status == "charging") {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChargingCarScreen()));
+      } else if (status == "scan car") {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChargeCarScreen()));
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Código QR no reconocido")),
         );
+        scannerController.start(); 
       }
     } catch (e) {
-      _hideLoadingDialog(); // Asegurar que el popup se cierre en caso de error
+      _hideLoadingDialog();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Error al procesar el código QR")),
+        const SnackBar(content: Text("Error al procesar el código QR")),
       );
-      print("❌ Error en _handleScan: $e");
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (!Platform.isIOS || !Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')) {
-      scannerController = MobileScannerController(facing: CameraFacing.back);
+      scannerController.start(); 
+    } finally {
+      setState(() => _isProcessing = false);
     }
   }
 
@@ -112,7 +124,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
     return Scaffold(
       appBar: CustomAppBar(title: "Escáner QR"),
       body: Platform.isIOS && Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')
-          ? const Center(child: Text("La cámara no está disponible en el simulador"))
+          ? const Center(child: Text("📵 La cámara no está disponible en el simulador"))
           : Stack(
               children: [
                 MobileScanner(
@@ -131,9 +143,9 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   right: 20,
                   child: Column(
                     children: [
-                      ElevatedButton(
+                     ElevatedButton(
                         onPressed: () {
-                          _handleScan("EC-H4F2M-8D722"); // 🔥 Simulación de QR
+                          _handleScan("CE-CTC04-C523J"); // 🔥 Simulación de QR
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
@@ -144,18 +156,20 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         child: const Text("🔄 Simular QR"),
                       ),
                       const SizedBox(height: 10),
-                      ElevatedButton(
+                      ElevatedButton.icon(
                         onPressed: () {
                           scannerController.stop();
                           Navigator.pop(context);
                         },
+                        icon: const Icon(Icons.cancel, size: 24, color: Colors.white),
+                        label: const Text("Cerrar escáner", style: TextStyle(fontSize: 16)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: Colors.red[600],
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          textStyle: const TextStyle(fontSize: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text("❌ Cerrar escáner"),
                       ),
                     ],
                   ),
