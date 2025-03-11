@@ -19,7 +19,6 @@ class _LeaveCarScreenState extends State<LeaveCarScreen> {
     _carPlateFuture = _fetchCarPlate();
   }
 
-  // 🔹 Obtiene la placa del camión según el qr1 almacenado
   Future<String> _fetchCarPlate() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -41,7 +40,7 @@ class _LeaveCarScreenState extends State<LeaveCarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], // Fondo oscuro
+      backgroundColor: Colors.grey[900], 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -85,7 +84,6 @@ class _LeaveCarScreenState extends State<LeaveCarScreen> {
               ),
               const SizedBox(height: 40),
 
-              // ✅ Botón Aceptar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -116,7 +114,6 @@ class _LeaveCarScreenState extends State<LeaveCarScreen> {
               ),
               const SizedBox(height: 15),
 
-              // ❌ Botón Cancelar con mejor estilo
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(

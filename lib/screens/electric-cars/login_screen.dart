@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gpcapp/screens/electric-cars/scan_screen.dart';
 import 'package:gpcapp/services/auth_service.dart';
@@ -45,11 +44,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     setState(() {
-      _isLoading = false; // Ocultar indicador de carga
+      _isLoading = false; 
     });
   }
 
-  // 🔹 Método para mostrar errores
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message, textAlign: TextAlign.center)),
@@ -61,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // 🔹 Fondo con Gradiente
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -72,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // 🔹 Imagen de fondo con opacidad
           Positioned.fill(
             child: Opacity(
               opacity: 0.3,
@@ -83,7 +79,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // 🔹 Contenido principal
           Center(
             child: Container(
               padding: const EdgeInsets.all(16.0),
@@ -112,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 🔹 Campo de Usuario
                   TextField(
                     controller: _usernameController,
                     decoration: const InputDecoration(

@@ -41,7 +41,7 @@ class _OccupiedCarScreenState extends State<OccupiedCarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], // Fondo oscuro para diseño moderno
+      backgroundColor: Colors.grey[900], 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -58,7 +58,6 @@ class _OccupiedCarScreenState extends State<OccupiedCarScreen> {
               ),
               const SizedBox(height: 10),
 
-              // 🔹 Muestra la placa del camión
               FutureBuilder<String>(
                 future: _carPlateFuture,
                 builder: (context, snapshot) {
@@ -85,7 +84,6 @@ class _OccupiedCarScreenState extends State<OccupiedCarScreen> {
               ),
               const SizedBox(height: 40),
 
-              // ✅ Botón Aceptar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -116,7 +114,6 @@ class _OccupiedCarScreenState extends State<OccupiedCarScreen> {
               ),
               const SizedBox(height: 15),
 
-              // ❌ Botón Cancelar con mejor estilo
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(

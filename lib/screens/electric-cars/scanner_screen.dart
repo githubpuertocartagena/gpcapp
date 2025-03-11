@@ -49,28 +49,25 @@ class _ScannerScreenState extends State<ScannerScreen> {
     );
   }
 
-  // 🔹 Cierra el popup de carga
   void _hideLoadingDialog() {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
   }
 
-  // 🔹 Cierra sesión y redirige a la pantalla de login
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpia todos los datos guardados
-    Navigator.pushReplacementNamed(context, "/login"); // Redirige al login
+    await prefs.clear(); 
+    Navigator.pushReplacementNamed(context, "/login");
   }
 
-  // 🔹 Maneja el escaneo
   void _handleScan(String qrValue) async {
-    if (_isProcessing) return; // Evita múltiples lecturas
+    if (_isProcessing) return; 
     setState(() => _isProcessing = true);
 
     try {
-      scannerController.stop(); // 🔹 Detener el escáner antes de continuar
-      _showLoadingDialog(); // Muestra el popup de carga
+      scannerController.stop(); 
+      _showLoadingDialog(); 
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("qr1", qrValue);
@@ -143,19 +140,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   right: 20,
                   child: Column(
                     children: [
-                     ElevatedButton(
-                        onPressed: () {
-                          _handleScan("CE-CTC04-C523J"); // 🔥 Simulación de QR
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          textStyle: const TextStyle(fontSize: 16),
-                        ),
-                        child: const Text("🔄 Simular QR"),
-                      ),
-                      const SizedBox(height: 10),
+                    
                       ElevatedButton.icon(
                         onPressed: () {
                           scannerController.stop();

@@ -11,13 +11,12 @@ class StopChargingScreen extends StatefulWidget {
 }
 
 class _StopCharginCarScreenState extends State<StopChargingScreen> {
-  bool _isLoading = false; // Controla el estado de carga
+  bool _isLoading = false; 
 
-  // 🔹 Función para mostrar el popup de carga
   void _showLoadingDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, // No permitir cerrar el popup manualmente
+      barrierDismissible: false, 
       builder: (context) {
         return const AlertDialog(
           content: Column(
@@ -33,17 +32,15 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
     );
   }
 
-  // 🔹 Función para cerrar el popup de carga
   void _hideLoadingDialog() {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
   }
 
-  // 🔹 Función para iniciar la carga
   Future<void> _stopCharging() async {
     setState(() => _isLoading = true);
-    _showLoadingDialog(); // Muestra el popup de carga
+    _showLoadingDialog(); 
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -53,13 +50,12 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
       final response = await ApiService.fetchRequest(
           "remove-station/$carCode/$username", "PUT");
 
-      _hideLoadingDialog(); // Oculta el popup de carga
+      _hideLoadingDialog(); 
 
       if (response == null) {
         throw Exception("No se pudo desasignar carro a estación.");
       }
 
-      // Redirigir a la pantalla de escaneo tras completar la acción
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => ScanScreen()),
@@ -76,14 +72,14 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], // Fondo oscuro para diseño moderno
+      backgroundColor: Colors.grey[900], 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.ev_station, size: 100, color: Colors.greenAccent), // Ícono de carga
+              const Icon(Icons.ev_station, size: 100, color: Colors.greenAccent), 
               const SizedBox(height: 20),
 
               const Text(
@@ -103,7 +99,7 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: _isLoading ? null : _stopCharging, // Evita múltiples clics
+                  onPressed: _isLoading ? null : _stopCharging, 
                   icon: const Icon(Icons.check_circle, color: Colors.white),
                   label: const Text("Sí, desconectarlo"),
                   style: ElevatedButton.styleFrom(
@@ -116,7 +112,7 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
               ),
               const SizedBox(height: 15),
 
-              // ❌ Botón Cancelar
+    
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(

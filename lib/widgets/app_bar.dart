@@ -10,16 +10,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
   });
 
-  // 🔹 Obtiene el usuario guardado en SharedPreferences
   Future<String> _getUsername() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString("username") ?? "Invitado";
   }
 
-  // 🔹 Función para hacer logout
   Future<void> _logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpia los datos almacenados
+    await prefs.clear(); 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
