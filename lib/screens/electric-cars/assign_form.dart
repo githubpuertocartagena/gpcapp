@@ -191,6 +191,34 @@ class _ElectricFormScreenState extends State<ElectricFormScreen> {
 
   // ✅ Función para guardar respuestas y observaciones
   void _saveForm() async {
+
+    bool allAnswered = questions.every((q) => selectedAnswers.containsKey(q["key"]));
+
+    if (!allAnswered) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Todos los campos son obligatorios")),
+      );
+      return;
+    }
+
+    final RegExp validTextRegex = RegExp(r"^[a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ.,:;()!?¡¿\s-]*$");
+
+    String observations = _observationsController.text.trim();
+
+    if (!validTextRegex.hasMatch(observations)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Las observaciones contienen caracteres inválidos")),
+      );
+      return;
+    }
+
+    if (observations.length > 50) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("La observación no puede superar los 50 caracteres")),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     _showLoadingDialog();
 

@@ -60,6 +60,10 @@ class _ConfirmChargeCarScreenState extends State<ConfirmChargeCarScreen> {
         throw Exception("No se pudo asignar carro a estación.");
       }
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vehículo conectado")),
+      );
+
       // Redirigir a la pantalla de escaneo tras completar la acción
       Navigator.pushReplacement(
         context,
@@ -88,7 +92,7 @@ class _ConfirmChargeCarScreenState extends State<ConfirmChargeCarScreen> {
               const SizedBox(height: 20),
 
               const Text(
-                "El carro va a cargarse.",
+                "Empezar a cargar el carro",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),

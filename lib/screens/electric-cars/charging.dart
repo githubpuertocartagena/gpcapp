@@ -19,14 +19,14 @@ class ChargingCarScreen extends StatelessWidget {
 
               // 📌 Mensaje informativo
               const Text(
-                "El carro ya está cargando...",
+                "El carro está cargando...",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 15),
 
               const Text(
-                "Por favor, espere a que termine la carga.",
+                "Por favor, desconectar la carga antes de continuar con el carro.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, color: Colors.white70),
               ),

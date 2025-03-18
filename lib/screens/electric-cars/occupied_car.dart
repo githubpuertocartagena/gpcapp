@@ -78,7 +78,7 @@ class _OccupiedCarScreenState extends State<OccupiedCarScreen> {
               const SizedBox(height: 15),
 
               const Text(
-                "¿Desea tomarlo?",
+                "¿Desea reasignarlo?",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, color: Colors.white70),
               ),

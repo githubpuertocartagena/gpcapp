@@ -16,6 +16,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false; 
 
   void _login() async {
+    if (_usernameController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+      _showErrorSnackbar("Por favor, ingrese usuario y contraseña");
+      return;
+    }
+
     setState(() {
       _isLoading = true; 
     });

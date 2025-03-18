@@ -20,14 +20,14 @@ class ChargeCarScreen extends StatelessWidget {
 
               // 📌 Mensaje informativo
               const Text(
-                "Debe seleccionar el carro a cargar",
+                "Debe seleccionar el carro",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),
               const SizedBox(height: 15),
 
               const Text(
-                "Seleccione carro a cargar",
+                "Escanear para cargar o desconectar el carro",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, color: Colors.white70),
               ),

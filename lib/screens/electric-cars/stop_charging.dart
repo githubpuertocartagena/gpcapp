@@ -56,6 +56,10 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
         throw Exception("No se pudo desasignar carro a estación.");
       }
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vehículo desconectado")),
+      );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => ScanScreen()),
@@ -83,7 +87,7 @@ class _StopCharginCarScreenState extends State<StopChargingScreen> {
               const SizedBox(height: 20),
 
               const Text(
-                "El carro va ha dejar de cargarse.",
+                "Dejar de cargar el carro",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),

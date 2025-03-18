@@ -51,7 +51,7 @@ class _LeaveCarScreenState extends State<LeaveCarScreen> {
               const SizedBox(height: 20),
 
               const Text(
-                "Desea entregar el carro.",
+                "Entregar el carro.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
               ),
